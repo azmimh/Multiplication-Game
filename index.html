@@ -1,314 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Addition Practice Arena</title>
-    <!-- Load Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Custom styles for bold aesthetics */
-        :root {
-            --color-primary: #4f46e5; /* Indigo */
-            --color-success: #10b981; /* Green */
-            --color-error: #ef4444; /* Red */
-        }
-        .text-huge {
-            font-size: 5rem; /* 80px */
-            line-height: 1;
-        }
-        .btn-submit {
-            transition: all 0.1s ease-in-out;
-        }
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-        }
-        .btn-submit:active {
-            transform: translateY(0);
-        }
-        .score-box {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Addition Practice Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ff0080, #7928ca);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .card {
+      background: #111827;
+      padding: 24px;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 16px;
+    }
+
+    .big {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+
+    .input {
+      font-size: 1.8rem;
+      padding: 12px;
+      width: 100%;
+      border-radius: 12px;
+      border: none;
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    button {
+      font-size: 1.4rem;
+      font-weight: bold;
+      padding: 14px 20px;
+      border-radius: 14px;
+      border: none;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+
+    .btn-primary {
+      background: #22c55e;
+      color: #000;
+    }
+
+    .btn-secondary {
+      background: #f59e0b;
+      color: #000;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: #000;
+    }
+
+    .score {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 16px;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .result {
+      font-size: 1.6rem;
+      font-weight: bold;
+      margin-top: 12px;
+    }
+
+    .correct {
+      color: #22c55e;
+    }
+
+    .wrong {
+      color: #ef4444;
+    }
+  </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4 font-sans">
-    <div id="game-container" class="w-full max-w-lg bg-white rounded-xl shadow-2xl p-6 md:p-10 border-t-8 border-indigo-600">
+<body>
+  <div class="card">
+    <h1>➕ ADDITION GAME</h1>
 
-        <h1 class="text-3xl md:text-4xl font-extrabold text-indigo-800 text-center mb-6 uppercase tracking-wider">
-            Math Practice Master
-        </h1>
-
-        <!-- Score Display -->
-        <div class="flex justify-around items-center mb-8 space-x-4">
-            <div id="score-correct" class="score-box bg-green-100 p-4 rounded-lg text-center flex-1 transition duration-300">
-                <p class="text-xl font-semibold text-green-700">Correct</p>
-                <p class="text-3xl font-bold text-green-600 mt-1">0</p>
-            </div>
-            <div id="score-incorrect" class="score-box bg-red-100 p-4 rounded-lg text-center flex-1 transition duration-300">
-                <p class="text-xl font-semibold text-red-700">Incorrect</p>
-                <p class="text-3xl font-bold text-red-600 mt-1">0</p>
-            </div>
-        </div>
-
-        <!-- Problem Area -->
-        <div id="problem-area" class="text-center mb-8">
-            <p id="question" class="text-huge font-black text-indigo-900 mb-6 select-none">
-                <span id="num1">?</span> + <span id="num2">?</span> = <span class="text-indigo-400">?</span>
-            </p>
-        </div>
-
-        <!-- Input and Submit -->
-        <div class="flex flex-col space-y-4">
-            <input type="number" id="answer-input" placeholder="Your Answer"
-                   class="w-full p-4 text-3xl text-center border-4 border-indigo-300 rounded-xl focus:border-indigo-500 outline-none font-mono tracking-wider transition duration-200">
-            <button id="submit-btn"
-                    class="btn-submit w-full py-4 text-3xl font-bold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition duration-150 shadow-lg shadow-indigo-500/50">
-                SUBMIT
-            </button>
-        </div>
-
-        <!-- Result Message -->
-        <div id="result-message" class="mt-6 h-10 text-center">
-            <!-- Message will appear here -->
-        </div>
-        
-        <!-- Debug/User ID Display (Mandatory for multi-user/Firestore apps) -->
-        <div class="mt-8 text-xs text-gray-500 text-center border-t pt-4">
-            <p>Authentication Status: <span id="auth-status" class="font-semibold text-red-500">Initializing...</span></p>
-            <p>User ID: <span id="user-id" class="break-all font-mono text-indigo-500"></span></p>
-        </div>
+    <!-- RANGE SETUP -->
+    <div id="rangeScreen">
+      <div class="big">Choose Number Range</div>
+      <input id="minNum" class="input" type="number" placeholder="MIN NUMBER" />
+      <input id="maxNum" class="input" type="number" placeholder="MAX NUMBER" />
+      <button class="btn-primary" onclick="startGame()">START GAME</button>
     </div>
 
-    <!-- JavaScript Game Logic and Firebase Integration -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <!-- GAME SCREEN -->
+    <div id="gameScreen" class="hidden">
+      <div class="big" id="question"></div>
+      <input id="answer" class="input" type="number" placeholder="YOUR ANSWER" />
+      <button class="btn-primary" onclick="checkAnswer()">SUBMIT</button>
 
-        // Firebase Globals (Mandatory check and usage)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-math-game-app';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+      <div id="result" class="result"></div>
 
-        let db, auth;
-        let currentUserId = null;
-        let scoreRef = null;
+      <div class="score">
+        <div>✅ Correct: <span id="correctScore">0</span></div>
+        <div>❌ Wrong: <span id="wrongScore">0</span></div>
+      </div>
 
-        // Game State
-        let num1 = 0;
-        let num2 = 0;
-        let currentScore = { correct: 0, incorrect: 0 };
-        let isProcessing = false;
+      <button class="btn-danger" onclick="resetGame()">CHANGE RANGE</button>
+    </div>
+  </div>
 
-        // DOM Elements
-        const num1El = document.getElementById('num1');
-        const num2El = document.getElementById('num2');
-        const answerInput = document.getElementById('answer-input');
-        const submitBtn = document.getElementById('submit-btn');
-        const resultMessageEl = document.getElementById('result-message');
-        const scoreCorrectEl = document.querySelector('#score-correct p:last-child');
-        const scoreIncorrectEl = document.querySelector('#score-incorrect p:last-child');
-        const authStatusEl = document.getElementById('auth-status');
-        const userIdEl = document.getElementById('user-id');
-        
-        // --- Firebase Initialization and Auth ---
+  <script>
+    let min = 0;
+    let max = 10;
+    let num1 = 0;
+    let num2 = 0;
+    let correct = 0;
+    let wrong = 0;
 
-        async function initializeFirebase() {
-            if (!firebaseConfig) {
-                console.error("Firebase config is missing. Running without persistence.");
-                authStatusEl.textContent = "Error (No Config)";
-                authStatusEl.className = "font-semibold text-red-700";
-                startGame();
-                return;
-            }
-            
-            setLogLevel('Debug');
-            const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
+    function startGame() {
+      min = parseInt(document.getElementById('minNum').value);
+      max = parseInt(document.getElementById('maxNum').value);
 
-            // 1. Sign in using custom token or anonymously
-            try {
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                    console.log("Signed in with custom token.");
-                } else {
-                    await signInAnonymously(auth);
-                    console.log("Signed in anonymously.");
-                }
-            } catch (error) {
-                console.error("Firebase Auth Error:", error);
-                authStatusEl.textContent = "Auth Failed";
-                authStatusEl.className = "font-semibold text-red-700";
-                // Even if auth fails, proceed to start the game without persistence.
-                startGame();
-            }
+      if (isNaN(min) || isNaN(max) || min > max) {
+        alert('Please enter a valid range');
+        return;
+      }
 
-            // 2. Auth state listener for setting up Firestore
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    currentUserId = user.uid;
-                    authStatusEl.textContent = "Authenticated";
-                    authStatusEl.className = "font-semibold text-green-600";
-                    userIdEl.textContent = currentUserId;
+      correct = 0;
+      wrong = 0;
+      document.getElementById('correctScore').textContent = 0;
+      document.getElementById('wrongScore').textContent = 0;
+      document.getElementById('result').textContent = '';
 
-                    // Define the score document path (Private Path)
-                    const scorePath = `artifacts/${appId}/users/${currentUserId}/game_score/current_score`;
-                    scoreRef = doc(db, scorePath);
-                    
-                    // Start listening to the score
-                    subscribeToScore();
-                } else {
-                    currentUserId = null;
-                    authStatusEl.textContent = "Not Signed In";
-                    authStatusEl.className = "font-semibold text-red-500";
-                    userIdEl.textContent = 'N/A';
-                    // If the user logs out or fails to sign in, use default score
-                    updateScoreUI(currentScore);
-                }
-                startGame();
-            });
-        }
+      document.getElementById('rangeScreen').classList.add('hidden');
+      document.getElementById('gameScreen').classList.remove('hidden');
 
-        function subscribeToScore() {
-            if (scoreRef) {
-                onSnapshot(scoreRef, (docSnap) => {
-                    if (docSnap.exists()) {
-                        currentScore = docSnap.data();
-                        console.log("Current score from Firestore:", currentScore);
-                    } else {
-                        // Document doesn't exist, create initial score
-                        currentScore = { correct: 0, incorrect: 0 };
-                        // Ensure initial document is created only once
-                        setDoc(scoreRef, currentScore).catch(e => console.error("Error setting initial score:", e));
-                        console.log("No score found, initialized to 0.");
-                    }
-                    updateScoreUI(currentScore);
-                }, (error) => {
-                    console.error("Firestore onSnapshot error:", error);
-                    // Use default score in case of error
-                    updateScoreUI(currentScore);
-                });
-            } else {
-                console.warn("Score reference not set. Running without real-time updates.");
-            }
-        }
+      generateQuestion();
+    }
 
-        async function updateScoreInFirestore(isCorrect) {
-            if (!scoreRef || !currentUserId) {
-                // If Firebase isn't ready or failed, just update local state
-                if (isCorrect) currentScore.correct++;
-                else currentScore.incorrect++;
-                updateScoreUI(currentScore);
-                console.warn("Firestore not ready. Score updated locally only.");
-                return;
-            }
+    function generateQuestion() {
+      num1 = Math.floor(Math.random() * (max - min + 1)) + min;
+      num2 = Math.floor(Math.random() * (max - min + 1)) + min;
+      document.getElementById('question').textContent = `${num1} + ${num2} = ?`;
+      document.getElementById('answer').value = '';
+      document.getElementById('answer').focus();
+    }
 
-            // Update local state first
-            if (isCorrect) currentScore.correct++;
-            else currentScore.incorrect++;
+    function checkAnswer() {
+      const userAnswer = parseInt(document.getElementById('answer').value);
+      const correctAnswer = num1 + num2;
 
-            try {
-                // Since we are using onSnapshot, this update will automatically reflect in the UI
-                await setDoc(scoreRef, currentScore, { merge: true });
-                console.log("Score updated in Firestore.");
-            } catch (error) {
-                console.error("Error updating score in Firestore:", error);
-            }
-        }
+      if (userAnswer === correctAnswer) {
+        correct++;
+        document.getElementById('result').textContent = 'CORRECT! 🎉';
+        document.getElementById('result').className = 'result correct';
+        document.getElementById('correctScore').textContent = correct;
+      } else {
+        wrong++;
+        document.getElementById('result').textContent = `WRONG! 😢 Answer is ${correctAnswer}`;
+        document.getElementById('result').className = 'result wrong';
+        document.getElementById('wrongScore').textContent = wrong;
+      }
 
-        function updateScoreUI(score) {
-            scoreCorrectEl.textContent = score.correct;
-            scoreIncorrectEl.textContent = score.incorrect;
-            
-            // Apply pulse effect to the score boxes
-            const correctBox = scoreCorrectEl.closest('.score-box');
-            const incorrectBox = scoreIncorrectEl.closest('.score-box');
+      setTimeout(generateQuestion, 1200);
+    }
 
-            correctBox.classList.remove('animate-pulse');
-            incorrectBox.classList.remove('animate-pulse');
-
-            // Simple animation for updates
-            setTimeout(() => {
-                correctBox.classList.add('animate-pulse');
-                incorrectBox.classList.add('animate-pulse');
-            }, 50);
-
-            setTimeout(() => {
-                correctBox.classList.remove('animate-pulse');
-                incorrectBox.classList.remove('animate-pulse');
-            }, 500);
-        }
-        
-        // --- Game Logic ---
-
-        function generateProblem() {
-            // Generate numbers between 1 and 99 for challenging addition
-            num1 = Math.floor(Math.random() * 99) + 1;
-            num2 = Math.floor(Math.random() * 99) + 1;
-            
-            num1El.textContent = num1;
-            num2El.textContent = num2;
-            answerInput.value = ''; // Clear previous input
-            answerInput.focus();
-            resultMessageEl.innerHTML = ''; // Clear result message
-            submitBtn.disabled = false;
-        }
-
-        function checkAnswer() {
-            if (isProcessing) return;
-            isProcessing = true;
-
-            const userAnswer = parseInt(answerInput.value, 10);
-            const correctAnswer = num1 + num2;
-
-            if (isNaN(userAnswer)) {
-                showMessage("Please enter a number!", 'text-yellow-600');
-                isProcessing = false;
-                return;
-            }
-
-            submitBtn.disabled = true;
-
-            if (userAnswer === correctAnswer) {
-                showMessage("✅ Correct! That's " + correctAnswer, 'text-green-600 font-bold');
-                updateScoreInFirestore(true);
-            } else {
-                showMessage(`❌ Incorrect! The answer was ${correctAnswer}`, 'text-red-600 font-bold');
-                updateScoreInFirestore(false);
-            }
-
-            // Wait a moment before loading the next question
-            setTimeout(() => {
-                isProcessing = false;
-                generateProblem();
-            }, 1500);
-        }
-
-        function showMessage(text, className) {
-            resultMessageEl.innerHTML = `<p class="text-2xl ${className}">${text}</p>`;
-        }
-
-        function handleInput(event) {
-            if (event.key === 'Enter') {
-                checkAnswer();
-            }
-        }
-
-        function startGame() {
-            // Attach event listeners only once
-            submitBtn.addEventListener('click', checkAnswer);
-            answerInput.addEventListener('keydown', handleInput);
-            
-            // Generate the first problem
-            if (!currentUserId) {
-                generateProblem(); // Start game immediately if not using persistence
-            }
-        }
-
-        // --- Main Execution ---
-        window.onload = initializeFirebase;
-    </script>
+    function resetGame() {
+      document.getElementById('gameScreen').classList.add('hidden');
+      document.getElementById('rangeScreen').classList.remove('hidden');
+    }
+  </script>
 </body>
 </html>
